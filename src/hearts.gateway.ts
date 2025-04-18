@@ -9,7 +9,12 @@ import {
 import { Socket } from 'socket.io';
 import { RoomsService } from './rooms/rooms.service';
 
-@WebSocketGateway({ cors: true })
+@WebSocketGateway({
+  namespace: 'hearts',
+  cors: {
+    origin: '*',
+  },
+})
 export class HeartsGateway implements OnGatewayConnection, OnGatewayDisconnect {
   constructor(private readonly roomsService: RoomsService) {}
 
@@ -18,11 +23,11 @@ export class HeartsGateway implements OnGatewayConnection, OnGatewayDisconnect {
   handleDisconnect(client: Socket) {}
 
   @SubscribeMessage('joinRoom')
-  handleJoinRoom(
+  async handleJoinRoom(
     @MessageBody() data: { roomId: string },
     @ConnectedSocket() client: Socket,
   ) {
-    client.join(data.roomId);
+    await client.join(data.roomId);
   }
 
   @SubscribeMessage('spawnHeart')
